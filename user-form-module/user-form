@@ -1,0 +1,256 @@
+Option Explicit
+'キャンセルボタン
+Private Sub CommandButton1_Click()
+
+'フォームを閉じる
+Unload UserForm2
+
+End Sub
+'入力ボタン
+Private Sub CommandButton2_Click()
+
+Dim sheeta As String
+
+sheeta = "記録"
+
+Sheets(sheeta).Select
+ActiveSheet.Unprotect
+
+
+Dim myDay As Variant
+
+myDay = TextBox3.Value
+
+'日付未入力時
+If TextBox3 = "" Then
+
+     MsgBox "日付を入力してください"
+     
+     Exit Sub
+End If
+
+Dim myDate As Date
+
+myDate = DateSerial(TextBox1.Value, TextBox2.Value, TextBox3.Value)
+'入力値が未来
+If myDate > Date Then
+
+    MsgBox "今日(" & Date & ")までの日付を入力してください"
+    
+    Exit Sub
+End If
+
+'入力値が過去
+If myDate < Date Then
+
+    Dim myMsg As String
+
+    myMsg = "記録を変更しますか？"
+        
+    Dim myBtn As Variant
+        
+    myBtn = MsgBox(myMsg, vbYesNo, vbExclamation)
+        
+        If myBtn = vbNo Then
+            
+            Exit Sub
+            
+        End If
+End If
+
+
+'最終列の取得
+Dim endCol As Integer
+
+endCol = Sheets(sheeta).Range("D3").End(xlToRight).Column
+
+
+'入力月の取得
+Dim myMonth As Integer
+
+myMonth = TextBox2.Value
+
+'一致する月のセルを探す
+Dim months As Range
+
+Set months = Sheets(sheeta).Range(Cells(2, 4), Cells(2, endCol)).Find(what:=myMonth & "月", LookIn:=xlValues)
+
+'一致した月のセルから後ろの範囲で日のセルを探す
+Dim monthcol As Integer
+
+monthcol = months.Column
+
+Dim days As Range
+
+Set days = Range(Cells(3, monthcol), Cells(3, endCol)).Find(what:=myDay, LookIn:=xlValues)
+
+'日が一致したセルの列を取得
+Dim col As Integer
+
+col = days.Column
+
+
+'オプションボタンの判定と棒グラフ作成
+Dim lista As Variant
+Dim a As Variant
+
+lista = Array(1, 2, 3, 4, 5)
+
+Dim listb As Variant
+Dim b As Variant
+
+listb = Array(4, 9, 5)
+
+'項目①の記入
+For Each a In lista
+
+    Dim myOpt As MSForms.OptionButton
+
+    Set myOpt = UserForm2.Controls("OptionButton" & a)
+    
+    If myOpt.Value = True Then
+    
+        Dim cella As Variant
+
+        Set cella = Cells(listb(0) + a, col)
+        
+        Dim cellx As Variant
+
+        Set cellx = Cells(listb(1), col)
+        
+        Dim celly As Variant
+        
+        Set celly = Cells(listb(2), col)
+        
+        With Sheets(sheeta).Range(celly, cellx).Interior
+            
+            .Pattern = xlNone
+            .TintAndShade = 0
+            .PatternTintAndShade = 0
+        End With
+        
+        Range(cella, cellx).Interior.Color = &HCCFFCC
+        
+        Exit For
+         
+    End If
+Next
+
+    lista(0) = lista(0) + 5
+    lista(1) = lista(1) + 5
+    lista(2) = lista(2) + 5
+    lista(3) = lista(3) + 5
+    lista(4) = lista(4) + 5
+      
+    listb(0) = listb(0) + 2
+    listb(1) = listb(1) + 7
+    listb(2) = listb(2) + 7
+    
+'項目②の記入
+For Each a In lista
+
+    Set myOpt = UserForm2.Controls("OptionButton" & a)
+        
+    If myOpt.Value = True Then
+    
+        Set cella = Cells(listb(0) + a, col)
+        
+        Set cellx = Cells(listb(1), col)
+        
+        Set celly = Cells(listb(2), col)
+        
+        With Sheets(sheeta).Range(celly, cellx).Interior
+            
+            .Pattern = xlNone
+            .TintAndShade = 0
+            .PatternTintAndShade = 0
+        End With
+        
+        Range(cella, cellx).Interior.Color = &HCCFFCC
+        
+        Exit For
+         
+    End If
+Next
+
+    lista(0) = lista(0) + 5
+    lista(1) = lista(1) + 5
+    lista(2) = lista(2) + 5
+    lista(3) = lista(3) + 5
+    lista(4) = lista(4) + 5
+      
+    listb(0) = listb(0) + 2
+    listb(1) = listb(1) + 7
+    listb(2) = listb(2) + 7
+    
+'項目③の記入
+For Each a In lista
+
+    Set myOpt = UserForm2.Controls("OptionButton" & a)
+        
+    If myOpt.Value = True Then
+    
+        Set cella = Cells(listb(0) + a, col)
+        
+        Set cellx = Cells(listb(1), col)
+        
+        Set celly = Cells(listb(2), col)
+        
+        With Sheets(sheeta).Range(celly, cellx).Interior
+            
+            .Pattern = xlNone
+            .TintAndShade = 0
+            .PatternTintAndShade = 0
+        End With
+        
+        Range(cella, cellx).Interior.Color = &HCCFFCC
+        
+        Exit For
+         
+    End If
+Next
+
+    lista(0) = lista(0) + 5
+    lista(1) = lista(1) + 5
+    lista(2) = lista(2) + 5
+    lista(3) = lista(3) + 5
+    lista(4) = lista(4) + 5
+      
+    listb(0) = listb(0) + 2
+    listb(1) = listb(1) + 7
+    listb(2) = listb(2) + 7
+    
+'項目④の記入
+For Each a In lista
+
+    Set myOpt = UserForm2.Controls("OptionButton" & a)
+        
+    If myOpt.Value = True Then
+    
+        Set cella = Cells(listb(0) + a, col)
+        
+        Set cellx = Cells(listb(1), col)
+        
+        Set celly = Cells(listb(2), col)
+        
+        With Sheets(sheeta).Range(celly, cellx).Interior
+            
+            .Pattern = xlNone
+            .TintAndShade = 0
+            .PatternTintAndShade = 0
+        End With
+        
+        Range(cella, cellx).Interior.Color = &HCCFFCC
+        
+        Exit For
+         
+    End If
+Next
+
+'フォームを閉じる
+Unload UserForm2
+
+Sheets(sheeta).Select
+ActiveSheet.Protect DrawingObjects:=True, Contents:=True, Scenarios:=True
+        
+End Sub
