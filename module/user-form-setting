@@ -1,0 +1,73 @@
+Option Explicit
+
+Sub ユーザーフォーム設定()
+
+Dim lista As Variant
+Dim a As Variant
+Dim listb As Variant
+Dim b As Variant
+Dim myOpt As MSForms.OptionButton
+Dim i As Integer
+
+
+
+lista = Array(5, 6, 7, 8, 9)
+listb = Array(1, 6, 11, 16)
+
+For Each a In lista
+
+    For Each b In listb
+    
+        Set myOpt = UserForm2.Controls("OptionButton" & b)
+        
+        myOpt.Caption = Sheets("記録").Range("B" & a).Text
+        
+    Next
+    
+    For i = 0 To UBound(listb)
+    
+         listb(i) = listb(i) + 1
+         
+    Next
+Next
+
+For i = 1 To 5
+    
+    Set myOpt = UserForm2.Controls("OptionButton" & i)
+    
+    myOpt.GroupName = "groupA"
+    
+Next
+
+For i = 6 To 10
+    
+    Set myOpt = UserForm2.Controls("OptionButton" & i)
+    
+    myOpt.GroupName = "groupB"
+    
+Next
+
+For i = 11 To 15
+    
+    Set myOpt = UserForm2.Controls("OptionButton" & i)
+    
+    myOpt.GroupName = "groupC"
+    
+Next
+
+For i = 16 To 20
+    
+    Set myOpt = UserForm2.Controls("OptionButton" & i)
+    
+    myOpt.GroupName = "groupD"
+    
+Next
+
+UserForm2.TextBox1.Value = Year(Date)
+UserForm2.TextBox2.Value = month(Date)
+UserForm2.TextBox3.Value = day(Date)
+
+UserForm2.Show vbModeless
+
+
+End Sub
