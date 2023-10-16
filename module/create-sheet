@@ -1,0 +1,352 @@
+Option Explicit
+
+Sub シート作成2()
+
+'画面更新停止
+Application.ScreenUpdating = False
+
+Dim sheeta As String
+Dim sheetb As String
+Dim sheetc As String
+
+sheeta = "記録"
+sheetb = "シート設定"
+sheetc = "日付"
+
+Sheets(sheeta).Unprotect
+'
+'シートのクリア(a)
+Sheets(sheeta).UsedRange.Clear
+
+Sheets(sheetc).Select
+ActiveSheet.Unprotect
+
+'シートのクリア(c)
+Dim lastrow As Integer
+
+lastrow = Sheets(sheetc).Range("A" & Rows.Count).End(xlUp).Row
+
+Sheets(sheetc).Range(Cells(1, 1), Cells(lastrow, 1)).Clear
+
+
+
+Dim startDay As Date
+Dim endDay As Date
+
+
+'入力内容の確認
+'開始日、終了日共に未入力の場合
+With Sheets(sheetb)
+
+If .Range("B4") = "" And .Range("B5") = "" Then
+
+    '期間を今月1ヶ月分に設定する
+    startDay = Date - (day(Date) - 1)
+    
+    endDay = WorksheetFunction.EoMonth(Date, 0)
+
+    '開始日または終了日が未入力の場合
+ElseIf .Range("B4") = "" Or .Range("B5") = "" Then
+ 
+        MsgBox "日付の入力に不足があります。" & vbCrLf _
+                & "開始日または終了日の入力を確認してください。"
+                
+       Exit Sub
+Else
+
+    '開始日、終了日の日付の取得
+    startDay = Sheets(sheetb).Range("B4").Value
+    
+    endDay = Sheets(sheetb).Range("B5").Value
+
+End If
+End With
+
+
+'開始日より前の日付が終了日に入力されている場合
+If startDay > endDay Then
+
+    MsgBox "終了日には、開始日より後の日付を入力してください"
+    
+    Exit Sub
+End If
+
+
+
+'日付の入力不備なし
+Dim days As Integer
+
+'日付の差を行数とする
+days = DateDiff("d", startDay, endDay)
+
+lastrow = days + 1
+
+
+
+Sheets(sheeta).Select
+ActiveSheet.Unprotect
+
+'日付シートに日付リストを作成しオートフィルする
+With Sheets(sheetc)
+
+    .Range("A1") = startDay
+    
+    .Range("A2") = startDay + 1
+End With
+    
+    Dim selection1 As Variant
+    
+    Dim selection2 As Variant
+        
+    Set selection1 = Sheets(sheetc).Range("A1:A2")
+    
+    Set selection2 = Sheets(sheetc).Range("A1", "A" & lastrow)
+    
+    selection1.AutoFill Destination:=selection2
+        
+    Dim selection3 As Variant
+    
+    Dim selection4 As Variant
+    
+'曜日の取得とオートフィルで曜日リストの作成
+With Sheets(sheetc)
+    
+    .Range("C1") = Format(startDay, "aaa")
+    
+    .Range("C2") = Format(startDay + 1, "aaa")
+End With
+    
+    Set selection3 = Sheets(sheetc).Range("C1:C2")
+    
+    Set selection4 = Sheets(sheetc).Range("C1", "C" & lastrow)
+
+    selection3.AutoFill Destination:=selection4
+    
+    
+    '日と曜日をまとめてコピー
+    Sheets(sheetc).Range("B1").Resize(lastrow, 2).Copy
+    
+    
+'ループしながらペーストする
+Dim lista As Variant
+
+lista = Array(3, 10, 17, 24)
+    
+Dim a As Variant
+
+For Each a In lista
+
+    Sheets(sheeta).Range("D" & a).PasteSpecial _
+            Paste:=xlPasteValues, _
+            Operation:=xlNone, _
+            SkipBlanks:=False, _
+            Transpose:=True
+            
+Next
+    
+Application.CutCopyMode = False
+    
+    
+'月のコピー、ペースト
+Sheets(sheetc).Range("D1").Resize(lastrow, 1).Copy
+    
+Sheets(sheeta).Range("D2").PasteSpecial _
+            Paste:=xlPasteValues, _
+            Operation:=xlNone, _
+            SkipBlanks:=False, _
+            Transpose:=True
+            
+Application.CutCopyMode = False
+
+
+'最初の月空欄の場合(最初の日付が1日以外の場合)
+If Sheets(sheeta).Range("D2") = "" Then
+
+    Sheets(sheeta).Range("D2") = month(startDay) & "月"
+    
+End If
+
+
+Sheets(sheeta).Select
+
+Application.DisplayAlerts = False
+
+'体調管理シート
+Sheets(sheeta).Range("A1") = "体調管理シート"
+
+Range("A1:I1").Merge
+
+With Sheets(sheeta).Range("A1").Font
+
+    .Name = "HGPｺﾞｼｯｸM"
+    .Size = 36
+    .Bold = True
+End With
+
+Application.DisplayAlerts = True
+
+'項目の転記
+With Sheets(sheeta)
+
+    .Range("A5") = Sheets(sheetb).Range("A15") & Sheets(sheetb).Range("B15")
+    
+    .Range("A12") = Sheets(sheetb).Range("A16") & Sheets(sheetb).Range("B16")
+    
+    .Range("A19") = Sheets(sheetb).Range("A17") & Sheets(sheetb).Range("B17")
+    
+    .Range("A26") = Sheets(sheetb).Range("A18") & Sheets(sheetb).Range("B18")
+End With
+
+
+Dim listb As Variant
+Dim b As Variant
+
+listb = Array(5, 12, 19, 26)
+
+'項目セルの連結,縦書き設定
+For Each b In listb
+
+    Dim selectionA As Variant
+
+    Set selectionA = Sheets(sheeta).Range("A" & b).Resize(5, 1)
+    '
+    With selectionA
+    
+            .Merge
+            .Orientation = xlVertical
+            .HorizontalAlignment = xlCenter
+            .VerticalAlignment = xlCenter
+    End With
+Next
+
+'5段階顔文字の転記
+
+For Each b In listb
+
+    Sheets(sheetb).Range("B8:B12").Copy
+
+    Sheets(sheeta).Range("B" & b).PasteSpecial _
+            Paste:=xlPasteValues, _
+            Operation:=xlNone, _
+            SkipBlanks:=False, _
+            Transpose:=False
+Next
+
+Application.CutCopyMode = False
+
+'5段階数字の転記
+For Each b In listb
+
+    Sheets(sheetb).Range("A8:A12").Copy
+
+    Sheets(sheeta).Range("C" & b).PasteSpecial _
+            Paste:=xlPasteValues, _
+            Operation:=xlNone, _
+            SkipBlanks:=False, _
+            Transpose:=False
+Next
+
+Application.CutCopyMode = False
+
+'基準の記入
+For Each b In listb
+
+    Sheets(sheeta).Range("B" & b).Offset(-1, 0) = "基準"
+    
+Next
+
+
+Dim lastcol As Integer
+
+lastcol = lastrow
+
+Set selectionA = Sheets(sheeta).Range(Cells(2, 1), Cells(30, 3 + lastcol))
+    
+With selectionA
+
+    '格子設定
+    .Borders.LineStyle = xlContinuous
+    '中央寄せ
+    .HorizontalAlignment = xlCenter
+    .VerticalAlignment = xlCenter
+            
+End With
+
+
+'月部分,縦書き設定
+Set selectionA = Sheets(sheeta).Range(Cells(2, 4), Cells(2, lastcol))
+
+With selectionA
+
+        .Orientation = xlVertical
+        .HorizontalAlignment = xlCenter
+        .VerticalAlignment = xlCenter
+End With
+
+
+'列幅の設定
+Sheets(sheeta).Rows("1:1").RowHeight = 100
+
+Sheets(sheeta).Rows("2:2").RowHeight = 50
+
+'D列以降の列幅の設定
+Sheets(sheeta).Range("D2", Cells(2, lastcol)).EntireColumn.ColumnWidth = 3
+
+'A列の幅設定
+Sheets(sheeta).Columns("A:A").ColumnWidth = 6
+
+'c列の幅設定
+Sheets(sheeta).Columns("C:C").ColumnWidth = 2
+
+
+'格子の設定(ドット線)
+
+For Each b In listb
+
+    Dim selectionB As Variant
+
+    Set selectionB = Sheets(sheeta).Range("D" & b).Resize(5, lastcol)
+    
+    With selectionB
+    
+        .Borders(xlDiagonalDown).LineStyle = xlNone
+        .Borders(xlDiagonalUp).LineStyle = xlNone
+        .Borders(xlEdgeLeft).LineStyle = xlContinuous
+        .Borders(xlEdgeTop).LineStyle = xlContinuous
+        .Borders(xlEdgeBottom).LineStyle = xlContinuous
+        .Borders(xlEdgeRight).LineStyle = xlContinuous
+        .Borders(xlInsideVertical).LineStyle = xlDot
+        .Borders(xlInsideHorizontal).LineStyle = xlDot
+    End With
+    
+    b = b + 2
+    
+    Dim selectionC As Variant
+    
+    Set selectionC = Sheets(sheeta).Range("D" & b).Resize(1, lastcol)
+    
+    'C列以降～6,13,20,27行目の色設定
+    With selectionC.Interior
+    
+        .ThemeColor = xlThemeColorDark1
+        .TintAndShade = -4.99893185216834E-02
+        
+    End With
+ 
+Next
+
+'Sheets(sheeta).Range("A1").Select
+
+
+Sheets(sheetc).Protect DrawingObjects:=True, Contents:=True, Scenarios:=True
+    
+
+Sheets(sheeta).Select
+ActiveSheet.Protect DrawingObjects:=True, Contents:=True, Scenarios:=True
+  
+
+'画面更新再開
+Application.ScreenUpdating = True
+
+
+End Sub
