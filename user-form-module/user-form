@@ -2,11 +2,12 @@ Option Explicit
 'キャンセルボタン
 Private Sub CommandButton1_Click()
 
-'フォームを閉じる
+'フォームを閉じる(ユーザーフォーむのキャンセルボタンに紐づける)
+
 Unload UserForm2
 
 End Sub
-'入力ボタン
+'入力ボタン(ユーザーフォームの入力ボタンに紐づける)
 Private Sub CommandButton2_Click()
 
 Dim sheeta As String
